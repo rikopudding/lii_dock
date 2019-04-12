@@ -1,5 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 /mysql
-/log
-/conf/nginx/conf.d
+/log/*
+/conf/nginx/conf.d/*
