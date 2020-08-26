@@ -15,27 +15,10 @@ services:
       - SET_CONTAINER_TIMEZONE=true
       - CONTAINER_TIMEZONE=Asia/Shanghai
     links:
-      - php56:fpm56
-      - php72:fpm72
+      - php74:fpm74
 
-  php56:
-    build: ./php/php56/
-    expose:
-      - "9000"
-    privileged: true
-    volumes:
-      - ../dns_web:/var/www/html/dns_web:rw
-      - ./conf/php56/php.ini:/usr/local/etc/php/php.ini:rw
-      - ./conf/php56/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf:rw
-      - ./log/php-fpm/:/var/log/php-fpm/:rw
-    environment:
-      - SET_CONTAINER_TIMEZONE=true
-      - CONTAINER_TIMEZONE=Asia/Shanghai
-    links:
-      - mysql:mysql
-
-  php72:
-    build: ./php/php72/
+  php74:
+    build: ./php/php74/
     expose:
       - "9000"
     privileged: true
@@ -59,8 +42,22 @@ services:
       - ./conf/mysql/my.cnf:/etc/mysql/my.cnf:ro
       - ./mysql/:/var/lib/mysql/:rw
       - ./log/mysql/:/var/log/mysql/:rw
+      - ./sources.list.stretch:/etc/apt/sources.list:ro
     environment:
       - SET_CONTAINER_TIMEZONE='true'
       - CONTAINER_TIMEZONE=Asia/Shanghai
       - MYSQL_ROOT_PASSWORD="chenliyi123"
 
+  node:
+    image: "node:12"
+    user: "node"
+    working_dir: /home/node/app
+    volumes:
+      - ./node-app:/home/node/app/:rw
+    environment:
+      - NODE_ENV=production
+      - SET_CONTAINER_TIMEZONE='true'
+      - CONTAINER_TIMEZONE=Asia/Shanghai
+    expose:
+      - "8081"
+    command: "npm start"
