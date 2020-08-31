@@ -49,15 +49,18 @@ services:
       - MYSQL_ROOT_PASSWORD="chenliyi123"
 
   node:
-    image: "node:12"
-    user: "node"
-    working_dir: /home/node/app
+    build: ./node/
+    # user: "node"
+    privileged: true
+    stdin_open: true
+    tty: true
+    working_dir: /usr/src/app
     volumes:
-      - ./node-app:/home/node/app/:rw
+      - ../:/usr/src/app/:rw
     environment:
-      - NODE_ENV=production
+      # - NODE_ENV=production
       - SET_CONTAINER_TIMEZONE='true'
       - CONTAINER_TIMEZONE=Asia/Shanghai
-    expose:
-      - "8081"
-    command: "npm start"
+    ports:
+      - "9527:9527"
+    command: "/bin/bash"
