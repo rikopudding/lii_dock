@@ -63,4 +63,4 @@ services:
       - CONTAINER_TIMEZONE=Asia/Shanghai
     ports:
       - "9527:9527"
-    command: "/bin/bash"
+    # command: "cd /usr/src/app/vue-element-admin && npm run dev"
