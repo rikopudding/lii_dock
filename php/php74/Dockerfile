@@ -25,3 +25,4 @@ RUN pecl install mongodb \
     && php composer-setup.php \
     && php -r "unlink('composer-setup.php');" \
     && mv composer.phar /usr/local/bin/composer
+ENV http_proxy= https_proxy=
