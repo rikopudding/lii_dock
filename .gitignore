@@ -3,3 +3,4 @@
 /mysql/*
 /log/*
 /conf/nginx/conf.d/*
+.env

@@ -1,9 +1,21 @@
-version: '2'
+version: '3'
 services:
   nginx:
+    container_name: nginx
     image: nginx:alpine
-    ports:
-      - "8087:80"
+    ports: 
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: bridge
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: bridge
+      - target: 6001
+        published: 6001
+        protocol: tcp
+        mode: host
     # Ensure the read and write access
     privileged: true
     volumes:
@@ -15,52 +27,86 @@ services:
       - SET_CONTAINER_TIMEZONE=true
       - CONTAINER_TIMEZONE=Asia/Shanghai
     links:
-      - php74:fpm74
-
-  php74:
-    build: ./php/php74/
+      # - php74:fpm74
+      - php53:fpm53
+      - php56:fpm56
+      - php72:fpm72
+  php53:
+    container_name: php53
+    build: ./php/php53/
     expose:
       - "9000"
     privileged: true
     volumes:
       - ../:/var/www/html/:rw
-      - ./conf/php72/php.ini:/usr/local/etc/php/php.ini:rw
-      - ./conf/php72/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf:rw
-      - ./log/php-fpm/:/var/log/php-fpm/:rw
+      - ./conf/php53/share/:/usr/share/php/:rw
+      # - ./conf/php74/php.ini:/usr/local/etc/php/php.ini:rw
+      # - ./conf/php74/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf:rw
+      # - ./log/php-fpm/:/var/log/php-fpm/:rw
     environment:
       - SET_CONTAINER_TIMEZONE=true
       - CONTAINER_TIMEZONE=Asia/Shanghai
-    links:
-      - mysql:mysql
+  php56:
+    container_name: php56
+    build: ./php/php56/
+    expose:
+      - "9000"
+    privileged: true
+    volumes:
+      - ../:/var/www/html/:rw
+      - ./conf/php56/share/:/usr/share/php/:rw
+      # - ./conf/php74/php.ini:/usr/local/etc/php/php.ini:rw
+      # - ./conf/php74/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf:rw
+      # - ./log/php-fpm/:/var/log/php-fpm/:rw
+    environment:
+      - SET_CONTAINER_TIMEZONE=true
+      - CONTAINER_TIMEZONE=Asia/Shanghai
+  php72:
+    container_name: php72
+    build: ./php/php72/
+    expose:
+      - "9000"
+    privileged: true
+    volumes:
+      - ../:/var/www/html/:rw
+      # - ./conf/php74/php.ini:/usr/local/etc/php/php.ini:rw
+      # - ./conf/php74/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf:rw
+      # - ./log/php-fpm/:/var/log/php-fpm/:rw
+    environment:
+      - SET_CONTAINER_TIMEZONE=true
+      - CONTAINER_TIMEZONE=Asia/Shanghai
+    # links:
+    #   - mysql:mysql
 
   mysql:
+    container_name: mysql57
     image: mysql:5.7
     ports:
-      - "3326:3306"
+      - "3306:3306"
     privileged: true
     volumes:
       - ./conf/mysql/my.cnf:/etc/mysql/my.cnf:ro
-      - ./mysql/:/var/lib/mysql/:rw
+      # - ./mysql/:/var/lib/mysql/:rw
       - ./log/mysql/:/var/log/mysql/:rw
       - ./sources.list.stretch:/etc/apt/sources.list:ro
     environment:
-      - SET_CONTAINER_TIMEZONE='true'
+      - SET_CONTAINER_TIMEZONE=true
       - CONTAINER_TIMEZONE=Asia/Shanghai
-      - MYSQL_ROOT_PASSWORD="chenliyi123"
+      - MYSQL_ROOT_PASSWORD=chenliyi123
 
-  node:
-    build: ./node/
-    # user: "node"
-    privileged: true
-    stdin_open: true
-    tty: true
-    working_dir: /usr/src/app
-    volumes:
-      - ../:/usr/src/app/:rw
-    environment:
-      # - NODE_ENV=production
-      - SET_CONTAINER_TIMEZONE='true'
-      - CONTAINER_TIMEZONE=Asia/Shanghai
-    ports:
-      - "9527:9527"
-    # command: "cd /usr/src/app/vue-element-admin && npm run dev"
+  # node:
+  #   build: ./node/
+  #   # user: "node"
+  #   privileged: true
+  #   stdin_open: true
+  #   tty: true
+  #   working_dir: /usr/src/app
+  #   volumes:
+  #     - ../:/usr/src/app/:rw
+  #   environment:
+  #     # - NODE_ENV=production
+  #     - SET_CONTAINER_TIMEZONE='true'
+  #     - CONTAINER_TIMEZONE=Asia/Shanghai
+  #   ports:
+  #     - "9527:9527"
+  #   # command: "cd /usr/src/app/vue-element-admin && npm run dev"
