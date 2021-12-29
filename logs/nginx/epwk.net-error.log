@@ -1,0 +1,3 @@
+2021/12/29 03:08:49 [error] 11#11: *6 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 172.18.0.1, server: *.epwk.me, request: "GET / HTTP/1.1", upstream: "fastcgi://172.18.0.2:9000", host: "www.epwk.me"
+2021/12/29 03:09:43 [error] 11#11: *9 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 172.18.0.1, server: *.epwk.me, request: "GET / HTTP/1.1", upstream: "fastcgi://172.18.0.2:9000", host: "www.epwk.me"
+2021/12/29 03:13:13 [error] 13#13: *2 FastCGI sent in stderr: "Primary script unknown" while reading response header from upstream, client: 172.18.0.1, server: *.epwk.me, request: "GET / HTTP/1.1", upstream: "fastcgi://172.18.0.2:9000", host: "www.epwk.me"
