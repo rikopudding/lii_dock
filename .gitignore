@@ -1,5 +1,5 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
-/log/*
+
 /conf/nginx/conf.d/*
 .env

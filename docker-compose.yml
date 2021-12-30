@@ -33,6 +33,8 @@ services:
     environment:
       - SET_CONTAINER_TIMEZONE=true
       - CONTAINER_TIMEZONE=Asia/Shanghai
+    extra_hosts:
+      host_internal: ${DOCKER_HOST_IP}
     networks:
       - backend
   php53:
