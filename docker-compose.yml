@@ -95,6 +95,19 @@ services:
     networks:
       - backend
 
+  redis:
+    container_name: redis
+    build: 
+      context: ./redis
+      args:
+        - REDIS_PWD=${REDIS_PWD}
+    volumes:
+      - ${DATA_PATH_HOST}/redis:/data
+    ports:
+      - "6379"
+    networks:
+      - backend
+
   jenkins:
     container_name: jenkins
     build:
