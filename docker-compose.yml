@@ -114,6 +114,7 @@ services:
       context: ./jenkins
       args:
         - CHANGE_SOURCE=${CHANGE_SOURCE}
+        - TIMEZONE=${TIMEZONE}
     ports:
       - "${JENKINS_PORT}:8080"
       - "50000:50000"
