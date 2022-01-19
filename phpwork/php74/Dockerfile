@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-bullseye
+FROM php:7.4-cli-bullseye
 
 
 
@@ -15,10 +15,28 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
     sed -i 's/security-cdn.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list \
 ;fi
 ARG LIIDOCK_PHP_VERSION="7.4"
+
+
+ARG PUID=1000
+ENV PUID ${PUID}
+ARG PGID=1000
+ENV PGID ${PGID}
+
+
+USER root
+
+RUN php -r "copy('https://install.phpcomposer.com/installer', 'composer-setup.php');" && \
+    php composer-setup.php && \
+    php -r "unlink('composer-setup.php');" && \
+    mv composer.phar /usr/local/bin/composer
+
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
     apt-get update -yqq && \
     pecl channel-update pecl.php.net && \
+    groupadd -g ${PGID} lii && \
+    useradd -l -u ${PUID} -g lii -m lii -G docker_env && \
+    usermod -p "*" lii -s /bin/bash && \
     apt-get install -yqq \
       apt-utils \
       gnupg2 \
@@ -43,6 +61,22 @@ RUN set -xe; \
       # Install the zip extension
       docker-php-ext-install zip && \
       php -m | grep -q 'zip'
+
+USER lii
+
+ARG COMPOSER_REPO_PACKAGIST
+ENV COMPOSER_REPO_PACKAGIST ${COMPOSER_REPO_PACKAGIST}
+
+RUN if [ ${COMPOSER_REPO_PACKAGIST} ]; then \
+    composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST} \
+;fi
+
+
+USER root
+
+COPY ./crontab /etc/cron.d
+
+RUN chmod -R 644 /etc/cron.d
 
 #
 #--------------------------------------------------------------------------
@@ -1169,7 +1203,6 @@ RUN set -xe; php -v | head -n 1 | grep -q "PHP ${LIIDOCK_PHP_VERSION}."
 #
 
 COPY ./lii.ini /usr/local/etc/php/conf.d
-COPY ./www.pool.conf /usr/local/etc/php-fpm.d/
 
 USER root
 
@@ -1178,27 +1211,5 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /var/log/lastlog /var/log/faillog
 
-# Configure non-root user.
-ARG PUID=1000
-ENV PUID ${PUID}
-ARG PGID=1000
-ENV PGID ${PGID}
-
-RUN groupmod -o -g ${PGID} www-data && \
-    usermod -o -u ${PUID} -g www-data www-data
-
-# Adding the faketime library to the preload file needs to be done last
-# otherwise it will preload it for all commands that follow in this file
-RUN if [ ${INSTALL_FAKETIME} = true ]; then \
-    echo "/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1" > /etc/ld.so.preload \
-;fi
-
-# Configure locale.
-ARG LOCALE=POSIX
-ENV LC_ALL ${LOCALE}
-
 WORKDIR /var/www/html
 
-CMD ["php-fpm"]
-
-EXPOSE 9000
