@@ -35,9 +35,13 @@ RUN set -xe; \
     apt-get update -yqq && \
     pecl channel-update pecl.php.net && \
     groupadd -g ${PGID} lii && \
-    useradd -l -u ${PUID} -g lii -m lii -G docker_env && \
+    # useradd -l -u ${PUID} -g lii -m lii -G docker_env && \
+    useradd -l -u ${PUID} -g lii -m lii && \
     usermod -p "*" lii -s /bin/bash && \
     apt-get install -yqq \
+      man \
+      vim \
+      cron \
       apt-utils \
       gnupg2 \
       git \
@@ -72,11 +76,7 @@ RUN if [ ${COMPOSER_REPO_PACKAGIST} ]; then \
 ;fi
 
 
-USER root
 
-COPY ./crontab /etc/cron.d
-
-RUN chmod -R 644 /etc/cron.d
 
 #
 #--------------------------------------------------------------------------
@@ -1210,6 +1210,12 @@ USER root
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /var/log/lastlog /var/log/faillog
+
+COPY ./crontab /etc/cron.d
+
+RUN chmod -R 644 /etc/cron.d
+
+USER lii
 
 WORKDIR /var/www/html
 

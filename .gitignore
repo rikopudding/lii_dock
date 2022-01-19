@@ -3,3 +3,4 @@
 /conf/nginx/conf.d/*
 .env
 docker-compose-other.yml
+/phpwork/contab/*

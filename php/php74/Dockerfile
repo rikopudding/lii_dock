@@ -1184,8 +1184,8 @@ ENV PUID ${PUID}
 ARG PGID=1000
 ENV PGID ${PGID}
 
-RUN groupmod -o -g ${PGID} www-data && \
-    usermod -o -u ${PUID} -g www-data www-data
+RUN groupmod -o -g ${PGID} lii && \
+    usermod -o -u ${PUID} -g lii lii
 
 # Adding the faketime library to the preload file needs to be done last
 # otherwise it will preload it for all commands that follow in this file

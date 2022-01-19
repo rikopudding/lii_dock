@@ -148,6 +148,8 @@ services:
         - no_proxy
     expose:
       - "9000"
+    depends_on:
+      - phpwork
     privileged: true
     volumes:
       - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
@@ -160,6 +162,7 @@ services:
       - backend
   phpwork:
     container_name: phpwork
+    tty: true
     build: 
       context: ./phpwork/php74/
       args:
