@@ -1,7 +1,12 @@
 FROM devilbox/php-fpm:7.2-prod
 
 # COPY ./sources.list.stretch /etc/apt/sources.list
-
+RUN pecl install yaf-3.1.4; \
+    docker-php-ext-enable yaf; \
+    { \ 
+		echo 'yaf.use_namespace=1'; \
+		echo 'yaf.use_spl_autoload=1'; \
+	} >> /usr/local/etc/php/conf.d/docker-php-ext-yaf.ini; \
 # RUN apt-get update && apt-get install -y \
 #         libfreetype6-dev \
 #         libjpeg62-turbo-dev \
