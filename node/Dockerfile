@@ -1,11 +1,14 @@
-FROM node:12-slim
-COPY ./sources.list.stretch /etc/apt/sources.list
-# WORKDIR /usr/src/app  
+FROM phusion/baseimage:focal-1.0.0
 
-RUN apt update && \  
-    npm --registry=https://registry.npm.taobao.org install -g npm @vue/cli
-    # cd /usr/src/app/vue-element-admin && \
-    # npm install  --registry=https://registry.npm.taobao.org 
+ARG DOCKER_UID
 
-# RUN npm --registry=https://registry.npm.taobao.org install -g npm @vue/cli  
-# CMD [ "cd /usr/src/app/vue-element-admin && npm install --registry=https://registry.npm.taobao.org " ]
+RUN groupadd -g ${DOCKER_UID} www-data && \
+    useradd -l -u ${DOCKER_UID} -g www-data -m www-data && \
+    ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone; \
+    sed -i 's/ports.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list; \
+    apt-get update; \
+    apt-get install -yqq \
+      apt-utils \
+      libzip-dev zip unzip
+
+    

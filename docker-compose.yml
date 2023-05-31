@@ -1,36 +1,88 @@
-version: '3.1'
-# networks:
-#   frontend:
-#     name: frontend_network
-#     driver: bridge
-#   backend:
-#     name: backend_network
-#     driver: bridge
+version: '3.5'
+networks:
+  lii_network:
+    name: lii_network
+    external: true
 services:
+  nginx:
+    restart: always
+    container_name: nginx
+    build:
+      context: ./nginx
+      args:
+        - DOCKER_UID=$DOCKER_UID
+        - ACME_EMAIL=$ACME_EMAIL
+        - http_proxy
+        - https_proxy
+    environment:
+      - CERT_HOME=/root/acme_cert
+    volumes:
+      - ${APP_CODE_PATH_HOST}:/var/www
+      - ${DATA_PATH_HOST}/jenkins:/var/jenkins_home
+      - ./logs/nginx:/var/log/nginx
+      - ./nginx/sites:/etc/nginx/vhost
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/acme_cert:/root/acme_cert
+      - ./nginx/acme-issue.sh:/usr/local/bin/acme-issue.sh
+    ports:
+      - 80:80
+      - 443:443
+      - 5080:5080
+    networks:
+      - lii_network
+    depends_on:
+      - php74
+      - php82
+  php82:
+    restart: always
+    container_name: php82
+    build: 
+      context: ./php-fpm
+      dockerfile: Dockerfile.82
+      args:
+        - DOCKER_UID=$DOCKER_UID
+    volumes:
+      - ${APP_CODE_PATH_HOST}:/var/www
+    networks:
+      - lii_network
+  php74:
+    restart: always
+    container_name: php74
+    build: 
+      context: ./php-fpm
+      dockerfile: Dockerfile.74
+      args:
+        - DOCKER_UID=$DOCKER_UID
+    volumes:
+      - ${APP_CODE_PATH_HOST}:/var/www
+    networks:
+      - lii_network
   jenkins:
+    profiles:
+      - jenkins
     restart: always
     container_name: jenkins
     build:
       context: ./jenkins
       args:
-        - CHANGE_SOURCE=${CHANGE_SOURCE}
-        - TIMEZONE=${TIMEZONE}
-        - SET_HTTP_PROXY=${SET_HTTP_PROXY}
-        - SET_HTTPS_PROXY=${SET_HTTPS_PROXY}
-        - SET_ALL_PROXY=${SET_ALL_PROXY}
+        - DOCKER_UID=$DOCKER_UID
     ports:
       - "${JENKINS_PORT}:8080"
       - "50000:50000"
     privileged: true
     volumes:
       - ${DATA_PATH_HOST}/jenkins:/var/jenkins_home
-    environment:
-      - TZ=${TIMEZONE}
-
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - lii_network
   mysql57:
     container_name: mysql57
     restart: always
-    image: mysql:5.7
+    build: 
+      context: ./mysql
+      dockerfile: Dockerfile.57
+      args:
+        - DOCKER_UID=$DOCKER_UID
     ports:
       - "${MYSQL_PORT}:3306"
     volumes:
@@ -46,7 +98,8 @@ services:
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      TZ: "${TIMEZONE}"
+    networks:
+      - lii_network
   redis:
     container_name: redis
     restart: always
@@ -58,5 +111,17 @@ services:
       - ${DATA_PATH_HOST}/redis:/data
     ports:
       - "${REDIS_PORT}:6379"
-    environment:
-      - TZ=${TIMEZONE}
+    networks:
+      - lii_network
+  # node:
+  #   container_name: node
+  #   restart: always
+  #   tty: true
+  #   build: 
+  #     context: ./node
+  #     args:
+  #       - DOCKER_UID=$DOCKER_UID
+  #   # volumes:
+  #   #   - ${APP_CODE_PATH_HOST}:/var/www
+  #   networks:
+  #     - lii_network

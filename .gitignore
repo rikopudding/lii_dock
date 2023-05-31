@@ -4,3 +4,4 @@
 .env
 docker-compose-other.yml
 /phpwork/contab/*
+nginx/acme-issue.sh

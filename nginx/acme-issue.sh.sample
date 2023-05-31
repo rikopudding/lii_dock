@@ -1,0 +1,27 @@
+#!/bin/sh
+
+issue_force=''
+while getopts ":f" opt; do
+  case $opt in
+    f)
+      issue_force='-f'
+      ;;
+    \?)
+    #   echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+
+
+export DP_Id=""
+export DP_Key=""
+
+alias acme=~/.acme.sh/acme.sh
+
+acme --issue --dns dns_dp  -d *.xxxx.com -d xxxx.com $issue_force
+
+acme --install-cert -d *.xxxx.com \
+    --key-file       /etc/nginx/ssl/*.xxxx.key  \
+    --fullchain-file /etc/nginx/ssl/xxxx_fullchain.pem \
+    --reloadcmd     "nginx -s reload"
