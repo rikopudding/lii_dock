@@ -80,13 +80,15 @@ function init_docker() {
     
     docker_network_name='lii_network'
     # 创建网络
-    docker network ls | grep $docker_network_name > /dev/null
+    sudo docker network ls | grep $docker_network_name > /dev/null
     if [ $? -eq 0 ]; then
         warning_msg "初始设定 --- docker $docker_network_name 网络已存在，跳过"
     else
-        docker network create --subnet 172.31.0.0/16 --gateway 172.31.0.1 $docker_network_name > /dev/null
+        sudo docker network create --subnet 172.31.0.0/16 --gateway 172.31.0.1 $docker_network_name > /dev/null
         success_msg "初始设定 --- docker $docker_network_name 网络创建成功"
     fi
+    # 设置镜像源
+    sudo echo '{"registry-mirrors": ["https://registry.docker-cn.com"]}' > /etc/docker/daemon.json
     
 }
 
