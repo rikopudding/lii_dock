@@ -107,6 +107,7 @@ services:
       context: ./redis
       args:
         - REDIS_PWD=${REDIS_PWD}
+        - DOCKER_UID=$DOCKER_UID
     volumes:
       - ${DATA_PATH_HOST}/redis:/data
     ports:
