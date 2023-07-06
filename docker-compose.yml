@@ -31,7 +31,6 @@ services:
     networks:
       - lii_network
     depends_on:
-      - php74
       - php82
   php82:
     restart: always
@@ -45,18 +44,34 @@ services:
       - ${APP_CODE_PATH_HOST}:/var/www
     networks:
       - lii_network
-  php74:
+  horizon82:
+    profiles: 
+      - horizon
     restart: always
-    container_name: php74
+    container_name: horizon82
     build: 
-      context: ./php-fpm
-      dockerfile: Dockerfile.74
+      context: ./horizon
+      dockerfile: Dockerfile.82
       args:
         - DOCKER_UID=$DOCKER_UID
     volumes:
       - ${APP_CODE_PATH_HOST}:/var/www
+      - ./horizon/supervisord.d:/etc/supervisord.d
+      - ./logs/supervisor/:/home/www-data/supervisor/logs
     networks:
       - lii_network
+  # php74:
+  #   restart: always
+  #   container_name: php74
+  #   build: 
+  #     context: ./php-fpm
+  #     dockerfile: Dockerfile.74
+  #     args:
+  #       - DOCKER_UID=$DOCKER_UID
+  #   volumes:
+  #     - ${APP_CODE_PATH_HOST}:/var/www
+  #   networks:
+  #     - lii_network
   jenkins:
     profiles:
       - jenkins
@@ -114,15 +129,3 @@ services:
       - "${REDIS_PORT}:6379"
     networks:
       - lii_network
-  # node:
-  #   container_name: node
-  #   restart: always
-  #   tty: true
-  #   build: 
-  #     context: ./node
-  #     args:
-  #       - DOCKER_UID=$DOCKER_UID
-  #   # volumes:
-  #   #   - ${APP_CODE_PATH_HOST}:/var/www
-  #   networks:
-  #     - lii_network

@@ -1,0 +1,4 @@
+*
+!.gitignore
+!laravel-horizon.conf.sample
+!laravel-schedule.conf.sample

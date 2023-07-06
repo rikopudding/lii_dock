@@ -1,0 +1,9 @@
+[program:project]
+user=www-data
+directory=/var/www/project
+command=php artisan horizon
+autostart=true
+autorestart=true
+redirect_stderr=true
+stopwaitsecs=3600
+stdout_logfile=/home/www-data/supervisor/logs/horizon.log

@@ -1,0 +1,8 @@
+FROM rikopudding/php:8.2-laravel-horizon
+
+USER root
+ARG DOCKER_UID
+RUN set -eux; \
+    docker-change-uid $DOCKER_UID
+
+USER www-data
