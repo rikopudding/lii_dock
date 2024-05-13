@@ -17,7 +17,7 @@ services:
     environment:
       - CERT_HOME=/root/acme_cert
     volumes:
-      - ${APP_CODE_PATH_HOST}:/var/www
+      - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
       - ${DATA_PATH_HOST}/jenkins:/var/jenkins_home
       - ./logs/nginx:/var/log/nginx
       - ./nginx/sites:/etc/nginx/vhost
@@ -35,7 +35,7 @@ services:
   php82:
     restart: always
     container_name: php82
-    build: 
+    build:
       context: ./php-fpm
       dockerfile: Dockerfile.82
       args:
@@ -45,11 +45,9 @@ services:
     networks:
       - lii_network
   horizon82:
-    profiles: 
-      - horizon
     restart: always
     container_name: horizon82
-    build: 
+    build:
       context: ./horizon
       dockerfile: Dockerfile.82
       args:
@@ -60,40 +58,10 @@ services:
       - ./logs/supervisor/:/home/www-data/supervisor/logs
     networks:
       - lii_network
-  # php74:
-  #   restart: always
-  #   container_name: php74
-  #   build: 
-  #     context: ./php-fpm
-  #     dockerfile: Dockerfile.74
-  #     args:
-  #       - DOCKER_UID=$DOCKER_UID
-  #   volumes:
-  #     - ${APP_CODE_PATH_HOST}:/var/www
-  #   networks:
-  #     - lii_network
-  jenkins:
-    profiles:
-      - jenkins
-    restart: always
-    container_name: jenkins
-    build:
-      context: ./jenkins
-      args:
-        - DOCKER_UID=$DOCKER_UID
-    ports:
-      - "${JENKINS_PORT}:8080"
-      - "50000:50000"
-    privileged: true
-    volumes:
-      - ${DATA_PATH_HOST}/jenkins:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - lii_network
   mysql57:
     container_name: mysql57
     restart: always
-    build: 
+    build:
       context: ./mysql
       dockerfile: Dockerfile.57
       args:
@@ -118,7 +86,7 @@ services:
   redis:
     container_name: redis
     restart: always
-    build: 
+    build:
       context: ./redis
       args:
         - REDIS_PWD=${REDIS_PWD}
